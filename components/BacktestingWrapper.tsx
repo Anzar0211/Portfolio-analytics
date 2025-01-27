@@ -4,6 +4,16 @@ import { useState } from "react";
 import BacktestForm from "@/components/BacktestForm";
 import BacktestResults from "@/components/BacktestResults";
 
+type AlphaVantageData = {
+  [date: string]: {
+    "1. open": string;
+    "2. high": string;
+    "3. low": string;
+    "4. close": string;
+    "5. volume": string;
+  };
+};
+
 type ChartData = {
   labels: string[];
   datasets: {
@@ -74,16 +84,20 @@ export default function BacktestingWrapper() {
     return data["Time Series (Daily)"];
   };
 
-  const filterDataByDate = (data: any, startDate: string, endDate: string) => {
+  const filterDataByDate = (
+    data: AlphaVantageData,
+    startDate: string,
+    endDate: string
+  ) => {
     return Object.keys(data)
       .filter((date) => date >= startDate && date <= endDate)
       .reduce((acc, date) => {
         acc[date] = data[date];
         return acc;
-      }, {} as { [key: string]: any });
+      }, {} as AlphaVantageData);
   };
 
-  const processChartData = (data: any): ChartData => {
+  const processChartData = (data: AlphaVantageData): ChartData => {
     const labels = Object.keys(data).reverse();
     const dataset = labels.map((date) => parseFloat(data[date]["4. close"]));
 
@@ -108,16 +122,13 @@ export default function BacktestingWrapper() {
     const initialPrice = prices[0];
     const finalPrice = prices[prices.length - 1];
 
-    // Total Return
-    const totalReturn = ((finalPrice - initialPrice) / initialPrice) * 100;
+    const totalReturn =
+      ((finalPrice - initialPrice) / initialPrice) * initialCapital;
 
-    // Annualized Return (assuming 1 year for simplicity)
     const annualizedReturn = totalReturn;
 
-    // Sharpe Ratio (placeholder calculation)
     const sharpeRatio = 1.5;
 
-    // Max Drawdown
     let maxDrawdown = 0;
     let peak = initialPrice;
     for (const price of prices) {

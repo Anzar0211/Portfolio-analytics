@@ -17,6 +17,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+type Trade = {
+  _id: string;
+  symbol: string;
+  type: "BUY" | "SELL";
+  price: number;
+  quantity: number;
+  timestamp: string;
+};
+
 export function RecentTrades({ className }: { className?: string }) {
   const [trades, setTrades] = useState([]);
 
@@ -48,7 +57,7 @@ export function RecentTrades({ className }: { className?: string }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {trades.map((trade: any) => (
+            {trades.map((trade: Trade) => (
               <TableRow key={trade._id}>
                 <TableCell className="font-medium">{trade.symbol}</TableCell>
                 <TableCell

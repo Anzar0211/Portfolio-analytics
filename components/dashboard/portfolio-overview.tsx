@@ -18,8 +18,24 @@ import {
 } from "recharts";
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 
+interface Portfolio {
+  totalValue: number;
+  cash: number;
+  stocks: Array<unknown>;
+}
+
+interface ChartDataPoint {
+  date: string;
+  value: number;
+}
+
+interface Metric {
+  title: string;
+  value: string;
+}
+
 export function PortfolioOverview({ className }: { className?: string }) {
-  const [portfolio, setPortfolio] = useState<any>(null);
+  const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,16 +51,14 @@ export function PortfolioOverview({ className }: { className?: string }) {
 
         const data = await response.json();
         if (data.length > 0) {
-          setPortfolio(data[0]); // Assuming a single portfolio per user
+          setPortfolio(data[0]);
         } else {
-          setError("No portfolio data available");
+          throw new Error("No portfolio data available");
         }
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message || "An unknown error occurred");
-        } else {
-          setError("An unknown error occurred");
-        }
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -54,7 +68,7 @@ export function PortfolioOverview({ className }: { className?: string }) {
   }, []);
 
   // Placeholder metrics and chart data during loading
-  const placeholderMetrics = [
+  const placeholderMetrics: Metric[] = [
     { title: "Total Portfolio Value", value: "Loading..." },
     { title: "Cash", value: "Loading..." },
     { title: "Total Stocks", value: "Loading..." },
@@ -63,32 +77,42 @@ export function PortfolioOverview({ className }: { className?: string }) {
     { title: "Max Drawdown", value: "Loading..." },
   ];
 
-  const placeholderChartData = Array(6).fill({ date: "", value: 0 });
+  const placeholderChartData: ChartDataPoint[] = Array(6).fill({
+    date: "",
+    value: 0,
+  });
 
-  // Use real data if available
-  const metrics = loading
+  const metrics: Metric[] = loading
     ? placeholderMetrics
     : [
         {
           title: "Total Portfolio Value",
-          value: `$${portfolio?.totalValue.toLocaleString()}`,
+          value: portfolio
+            ? `$${portfolio.totalValue.toLocaleString()}`
+            : "N/A",
         },
-        { title: "Cash", value: `$${portfolio?.cash.toLocaleString()}` },
-        { title: "Total Stocks", value: portfolio?.stocks.length || 0 },
+        {
+          title: "Cash",
+          value: portfolio ? `$${portfolio.cash.toLocaleString()}` : "N/A",
+        },
+        {
+          title: "Total Stocks",
+          value: portfolio ? portfolio.stocks.length.toString() : "N/A",
+        },
         { title: "ROI", value: "12.3%" }, // Example static metric
         { title: "CAGR", value: "10.5%" }, // Example static metric
         { title: "Max Drawdown", value: "-5.8%" }, // Example static metric
       ];
 
-  const chartData = loading
+  const chartData: ChartDataPoint[] = loading
     ? placeholderChartData
     : [
-        { date: "Jan", value: portfolio?.totalValue * 0.8 },
-        { date: "Feb", value: portfolio?.totalValue * 0.85 },
-        { date: "Mar", value: portfolio?.totalValue * 0.9 },
-        { date: "Apr", value: portfolio?.totalValue * 0.95 },
-        { date: "May", value: portfolio?.totalValue * 0.98 },
-        { date: "Jun", value: portfolio?.totalValue },
+        { date: "Jan", value: portfolio ? portfolio.totalValue * 0.8 : 0 },
+        { date: "Feb", value: portfolio ? portfolio.totalValue * 0.85 : 0 },
+        { date: "Mar", value: portfolio ? portfolio.totalValue * 0.9 : 0 },
+        { date: "Apr", value: portfolio ? portfolio.totalValue * 0.95 : 0 },
+        { date: "May", value: portfolio ? portfolio.totalValue * 0.98 : 0 },
+        { date: "Jun", value: portfolio ? portfolio.totalValue : 0 },
       ];
 
   return (
@@ -96,7 +120,11 @@ export function PortfolioOverview({ className }: { className?: string }) {
       <CardHeader>
         <CardTitle>Portfolio Overview</CardTitle>
         <CardDescription>
-          Your portfolio performance and key metrics
+          {error ? (
+            <span className="text-red-500">{error}</span>
+          ) : (
+            "Your portfolio performance and key metrics"
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col justify-between">
@@ -129,7 +157,7 @@ export function PortfolioOverview({ className }: { className?: string }) {
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tickFormatter={(value) => (value ? value : "")}
+                  tickFormatter={(value) => value || ""}
                 />
                 <YAxis
                   axisLine={false}

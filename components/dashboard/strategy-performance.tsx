@@ -118,7 +118,7 @@ export function StrategyPerformance({ className }: StrategyPerformanceProps) {
                 axisLine={false}
                 tickLine={false}
                 height={100}
-                tick={{ fontSize: 10 }} // Adjust the font size as needed
+                tick={{ fontSize: 10 }}
               />
               <YAxis
                 yAxisId="left"

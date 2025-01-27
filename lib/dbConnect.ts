@@ -6,13 +6,27 @@ if (!process.env.MONGODB_URI) {
 
 const MONGODB_URI: string = process.env.MONGODB_URI
 
-let cached = (global as any).mongoose
 
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null }
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
-async function dbConnect() {
+
+interface GlobalWithMongoose extends Global {
+  mongoose?: MongooseCache;
+}
+
+
+declare const global: GlobalWithMongoose
+
+let cached = global.mongoose || { conn: null, promise: null }
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null }
+}
+
+async function dbConnect(): Promise<typeof mongoose> {
   if (cached.conn) {
     return cached.conn
   }
@@ -38,4 +52,3 @@ async function dbConnect() {
 }
 
 export default dbConnect
-

@@ -3,7 +3,17 @@
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 
-export default function BacktestForm({ onSubmit }) {
+type BacktestFormProps = {
+  onSubmit: (data: {
+    strategy: string;
+    symbol: string;
+    startDate: string;
+    endDate: string;
+    initialCapital: string;
+  }) => Promise<void>;
+};
+
+export default function BacktestForm({ onSubmit }: BacktestFormProps) {
   const [strategy, setStrategy] = useState("");
   const [symbol, setSymbol] = useState(""); // State for symbol
   const [startDate, setStartDate] = useState("");

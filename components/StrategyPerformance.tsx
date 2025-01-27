@@ -49,20 +49,20 @@ export default function StrategyPerformance() {
       profits: [12500, 15000, 9800, 11200],
     };
 
-    setChartData({
+    setChartData((prevChartData) => ({
       labels: mockData.labels,
       datasets: [
         {
-          ...chartData.datasets[0],
+          ...prevChartData.datasets[0],
           data: mockData.winRates,
         },
         {
-          ...chartData.datasets[1],
+          ...prevChartData.datasets[1],
           data: mockData.profits,
         },
       ],
-    });
-  }, []);
+    }));
+  }, []); // Empty dependency array
 
   const options = {
     responsive: true,
