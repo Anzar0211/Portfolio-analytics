@@ -56,59 +56,9 @@ The Portfolio Analytics Dashboard is a comprehensive web application designed fo
    npm run dev
    \`\`\`
 
-8. Open \`http://localhost:3000\` in your browser to view the application.
+8. Open \`http://localhost:3000` in your browser to view the application.
 
-## Project Structure
 
-\`\`\`
-portfolio-analytics-dashboard/
-├── app/
-│   ├── (pages)/
-│   │   ├── dashboard/
-│   │   ├── strategies/
-│   │   ├── backtesting/
-│   │   ├── market-feed/
-│   │   └── stock-selector/
-│   ├── api/
-│   │   ├── portfolio/
-│   │   ├── strategies/
-│   │   ├── trades/
-│   │   └── stocks/
-│   ├── sign-in/
-│   ├── sign-up/
-│   └── layout.tsx
-├── components/
-│   ├── ui/
-│   ├── BacktestForm.tsx
-│   ├── BacktestResults.tsx
-│   ├── DashboardHeader.tsx
-│   ├── EconomicCalendar.tsx
-│   ├── MarketMovers.tsx
-│   ├── MarketNews.tsx
-│   ├── PortfolioOverview.tsx
-│   ├── RecentTrades.tsx
-│   ├── StockSelector.tsx
-│   └── StrategyCard.tsx
-├── lib/
-│   ├── mongodb.ts
-│   └── mongoose.ts
-├── models/
-│   ├── Portfolio.ts
-│   ├── Stock.ts
-│   ├── Strategy.ts
-│   ├── Trade.ts
-│   
-├── scripts/
-│   └── populateStocks.js
-├── public/
-├── styles/
-│   └── globals.css
-├── .env.local
-├── next.config.js
-├── package.json
-├── README.md
-└── tsconfig.json
-\`\`\`
 
 ## API Endpoints
 
