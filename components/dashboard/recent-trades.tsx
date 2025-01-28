@@ -38,17 +38,33 @@ export function RecentTrades({ className }: { className?: string }) {
         const response = await fetch("/api/trades");
 
         if (!response.ok) {
-          throw new Error("Failed to fetch trades.");
+          switch (response.status) {
+            case 401:
+              throw new Error("Unauthorized access. Please log in.");
+            case 404:
+              throw new Error("No recent trades found.");
+            case 500:
+              throw new Error("An internal server error occurred.");
+            case 503:
+              throw new Error(
+                "Database connection error. Please try again later."
+              );
+            default:
+              throw new Error("Failed to fetch trades.");
+          }
         }
 
         const data = await response.json();
-        setTrades(data);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message || "An unknown error occurred");
+
+        if (!data || data.length === 0) {
+          setError("No recent trades found.");
         } else {
-          setError("An unknown error occurred");
+          setTrades(data);
         }
+      } catch (err: unknown) {
+        const errorMessage =
+          err instanceof Error ? err.message : "An unknown error occurred";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }

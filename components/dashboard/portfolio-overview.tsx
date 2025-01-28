@@ -46,14 +46,32 @@ export function PortfolioOverview({ className }: { className?: string }) {
         const response = await fetch("/api/portfolio");
 
         if (!response.ok) {
-          throw new Error("Failed to fetch portfolio data");
+          switch (response.status) {
+            case 401:
+              setError("Unauthorized access. Please log in.");
+              break;
+            case 404:
+              setError("No portfolio found.");
+              break;
+            case 500:
+              setError("An internal server error occurred.");
+              break;
+            case 503:
+              setError("Database connection error. Please try again later.");
+              break;
+            default:
+              setError("An unexpected error occurred.");
+          }
+          setLoading(false);
+          return;
         }
 
         const data = await response.json();
-        if (data.length > 0) {
-          setPortfolio(data[0]);
+
+        if (!data || data.length === 0) {
+          setError("No portfolio found.");
         } else {
-          throw new Error("No portfolio data available");
+          setPortfolio(data[0]);
         }
       } catch (err: unknown) {
         const errorMessage =
@@ -66,7 +84,6 @@ export function PortfolioOverview({ className }: { className?: string }) {
 
     fetchPortfolio();
   }, []);
-
   // Placeholder metrics and chart data during loading
   const placeholderMetrics: Metric[] = [
     { title: "Total Portfolio Value", value: "Loading..." },
@@ -121,7 +138,21 @@ export function PortfolioOverview({ className }: { className?: string }) {
         <CardTitle>Portfolio Overview</CardTitle>
         <CardDescription>
           {error ? (
-            <span className="text-red-500">{error}</span>
+            <div className="text-red-500">
+              {error}
+              {error === "No portfolio found." && (
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Please{" "}
+                  <a
+                    href="/stock-selector"
+                    className="text-primary hover:underline"
+                  >
+                    add stocks
+                  </a>{" "}
+                  to get started.
+                </p>
+              )}
+            </div>
           ) : (
             "Your portfolio performance and key metrics"
           )}
